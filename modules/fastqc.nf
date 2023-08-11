@@ -1,5 +1,5 @@
 process fastqc {
-  module 'fastqc/0.11.8'
+  container 'quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0'
   memory '32GB'
   cpus 4
   time '1 h'

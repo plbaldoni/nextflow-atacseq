@@ -1,5 +1,5 @@
 process coverage {
-  module 'deeptools/3.5.1'
+  container 'quay.io/biocontainers/deeptools:3.5.1--pyhdfd78af_1'
   memory '64GB'
   cpus 8
   time '1 h'
