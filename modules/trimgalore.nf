@@ -1,5 +1,5 @@
 process trimgalore {
-  container 'quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0'
+  module 'trimgalore/0.6.7'
   memory '32GB'
   cpus 4
   time '1 h'

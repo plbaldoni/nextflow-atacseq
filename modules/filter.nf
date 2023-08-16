@@ -3,8 +3,8 @@ process filter {
   // failing platform, only properly paired) followed by (1) removal of orphan reads 
   // and pairs mapping to different chromosomes, and (2) mark and removal of duplicates
   
-  container 'quay.io/biocontainers/samtools:1.17--hd87286a_1'
-  container 'quay.io/biocontainers/picard:3.0.0--hdfd78af_1'
+  module 'samtools/1.18'
+  module 'picard-tools/2.26.11'
   memory '32GB'
   cpus 4
   time '4 h'
