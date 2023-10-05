@@ -4,25 +4,28 @@ process subread_align {
   memory '64GB'
   cpus 8
   time '4 h'
+  tag "$sample_id"
 
   input:
     tuple val(sample_id), path(reads)
     
   output:
-    file "*.{bam,bai,stat}"
+    tuple val(sample_id), path(outbam), path(outstat)
 
   script:
     outbam = "${sample_id}.bam"
     outstat = "${sample_id}.stat"
+    def single = reads instanceof Path
+    def read1 = !single ? /-r "${reads[0]}"/ : /-r "${reads}"/
+    def read2 = !single ? /-R "${reads[1]}"/ : ''
     """
     subread-align --sortReadsByCoordinates --multiMapping \
     -T $task.cpus \
-    -i $params.subreadIindex \
+    -i $params.subreadIndex \
     -t 1 \
     -D $params.maxfraglen \
     -B $params.maxmultimap \
-    -r ${reads[0]} \
-    -R ${reads[1]} \
+    ${read1} ${read2} \
     -o ${outbam}
     
     samtools index ${outbam}

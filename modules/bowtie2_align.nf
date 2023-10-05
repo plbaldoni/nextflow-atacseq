@@ -4,23 +4,27 @@ process bowtie2_align {
   memory '64GB'
   cpus 8
   time '4 h'
+  tag "$sample_id"
 
   input:
     tuple val(sample_id), path(reads)
     
   output:
-    file "*.{bam,bai,stat}"
+    tuple val(sample_id), path(outbam), path(outstat)
 
   script:
     outbam = "${sample_id}.bam"
     outstat = "${sample_id}.stat"
+    def single = reads instanceof Path
+    def read1 = !single ? /-1 "${reads[0]}"/ : /-U "${reads}"/
+    def read2 = !single ? /-2 "${reads[1]}"/ : ''
     """
     bowtie2 --mm \
     -k $params.maxmultimap \
     -X $params.maxfraglen \
     --threads $task.cpus \
     -x $params.bowtie2Index \
-   	-1 ${reads[0]} -2 ${reads[1]} |
+   	${read1} ${read2} |
    	samtools view -Su /dev/stdin | samtools sort - -o ${outbam}
     
     samtools index ${outbam}

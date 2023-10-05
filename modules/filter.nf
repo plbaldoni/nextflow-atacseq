@@ -8,32 +8,39 @@ process filter {
   memory '32GB'
   cpus 4
   time '4 h'
-  publishDir params.outdir, mode: 'copy', pattern: '*.{filt.nodup.bam,filt.nodup.bam.bai}'
-
+  publishDir params.outdir, mode: 'copy', pattern: 'alignment/*.{bam,bam.bai}'
+  tag "$sample_id"
 
   input:
-    file alignment
+    tuple val(sample_id), path(outbam), path(outstat)
 
   output:
-    file "*.{filt.nodup.bam,filt.nodup.bam.bai,filt.nodup.stat,.filt.dup,.filt.stat}"
+    tuple val(sample_id), path(nodupbam), path(nodupbambai), path(nodupbam_stat)
 
   script:
-    bam = "${alignment[0]}"
-    tmpbam = "${alignment[0].baseName}.tmp.bam"
-    tmpfixbam = "${alignment[0].baseName}.tmp.fix.bam"
-    filtbam = "${alignment[0].baseName}.filt.bam"
-    filttmpbam = "${alignment[0].baseName}.filt.tmp.bam"
-    filtbam_qc="${alignment[0].baseName}.filt.dup"
-    filtbam_stat="${alignment[0].baseName}.filt.stat"
-    nodupbam="${alignment[0].baseName}.filt.nodup.bam"
-    nodupbam_stat="${alignment[0].baseName}.filt.nodup.stat"
+    tmpbam = "${sample_id}.tmp.bam"
+    tmpfixbam = "${sample_id}.tmp.fix.bam"
+    filtbam = "${sample_id}.filt.bam"
+    filttmpbam = "${sample_id}.filt.tmp.bam"
+    filtbam_qc="${sample_id}.filt.dup"
+    filtbam_stat="${sample_id}.filt.stat"
+    nodupbam="alignment/${sample_id}.bam"
+    nodupbambai="alignment/${sample_id}.bam.bai"
+    nodupbam_stat="alignment/${sample_id}.filt.nodup.stat"
     
+    def opt = !params.singleEnd ? /-F 1804 -f 2/ : /-F 1804/
     """
-    samtools view -F 1804 -f 2 -q ${params.mapq} -u ${bam} | samtools sort -n /dev/stdin -o ${tmpbam}
+    mkdir alignment
+    
+    # Remove read/mate unmapped, not primary alignment, reads failing platform, and low MAPQ reads
+    samtools view ${opt} -q ${params.mapq} -u ${outbam} | samtools sort -n /dev/stdin -o ${tmpbam}
+    
+    # Remove orphan reads and reads maping to different chromosomes
     samtools fixmate -r ${tmpbam} ${tmpfixbam}
-    samtools view -F 1804 -f 2 -u ${tmpfixbam} | samtools sort /dev/stdin -o ${filtbam}
+    samtools view ${opt} -u ${tmpfixbam} | samtools sort /dev/stdin -o ${filtbam}
     rm -rf ${tmpbam} ${tmpfixbam}
     
+    # Marking duplicates and index
     MarkDuplicates \
     --INPUT ${filtbam} \
     --OUTPUT ${filttmpbam} \
@@ -42,11 +49,11 @@ process filter {
     --ASSUME_SORTED true \
     --REMOVE_DUPLICATES false
     mv ${filttmpbam} ${filtbam}
-    
     samtools index  ${filtbam}
     samtools stat  ${filtbam} > ${filtbam_stat}
     
-    samtools view -F 1804 -f 2 -b ${filtbam} > ${nodupbam}
+    # Remove duplicates and index
+    samtools view ${opt} -b ${filtbam} > ${nodupbam}
     samtools index ${nodupbam}
     samtools stat ${nodupbam} > ${nodupbam_stat}
     """
