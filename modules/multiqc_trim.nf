@@ -6,7 +6,6 @@ process multiqc_trim {
   publishDir params.outdir, mode: 'copy'
 
   input:
-    file qc_raw
     file trim
     file qc_trim
     file alignment

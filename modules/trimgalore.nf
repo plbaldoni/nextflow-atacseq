@@ -9,15 +9,25 @@ process trimgalore {
     tuple val(sample_id), path(reads)
     
   output:
-    tuple val(sample_id), path("*.gz")
+    tuple val(sample_id), path("*.trimmed.fastq.gz")
     file "*.txt"
     
   script:
     def single = reads instanceof Path
-    def read1 = !single ? /"--paired ${reads[0]}"/ : /"${reads}"/
+    def read1 = !single ? /--paired "${reads[0]}"/ : /"${reads}"/
     def read2 = !single ? /"${reads[1]}"/ : ''
     
+    if( params.singleEnd ) {
+      mvr1 = /mv *val*.fq.gz "${reads.simpleName}".trimmed.fastq.gz/
+      mvr2 = ''
+    }
+    else {
+      mvr1 = /mv *_val_1.fq.gz "${reads[0].simpleName}".trimmed.fastq.gz/
+      mvr2 = /mv *_val_2.fq.gz "${reads[1].simpleName}".trimmed.fastq.gz/
+    }
     """
     trim_galore -e $params.erate --cores $task.cpus ${read1} ${read2}
+    ${mvr1}
+    ${mvr2}
     """
 }

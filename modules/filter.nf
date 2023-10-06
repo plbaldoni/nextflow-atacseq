@@ -24,11 +24,20 @@ process filter {
     filttmpbam = "${sample_id}.filt.tmp.bam"
     filtbam_qc="${sample_id}.filt.dup"
     filtbam_stat="${sample_id}.filt.stat"
-    nodupbam="alignment/${sample_id}.filt.nodup.bam"
-    nodupbambai="alignment/${sample_id}.filt.nodup.bam.bai"
-    nodupbam_stat="alignment/${sample_id}.filt.nodup.stat"
     
     def opt = !params.singleEnd ? /-F 1804 -f 2/ : /-F 1804/
+    
+    if( params.trim ) {
+      nodupbam ="alignment/${sample_id}.trimmed.filt.nodup.bam"
+      nodupbambai = "alignment/${sample_id}.trimmed.filt.nodup.bam.bai"
+      nodupbam_stat = "alignment/${sample_id}.trimmed.filt.nodup.stat"
+    }
+    else {
+      nodupbam = "alignment/${sample_id}.filt.nodup.bam"
+      nodupbambai = "alignment/${sample_id}.filt.nodup.bam.bai"
+      nodupbam_stat = "alignment/${sample_id}.filt.nodup.stat"
+    }
+    
     """
     mkdir alignment
     

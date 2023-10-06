@@ -38,14 +38,13 @@ workflow {
     ch_reads_input = Channel.fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2, checkIfExists: true)
   }
   
-  ch_fastqc = fastqc(ch_reads_input)
-  
   if ( params.trim ) {
     (ch_reads,ch_trimgalore_txt) = trimgalore(ch_reads_input)
     ch_fastqc_trim = fastqc_trim(ch_reads)
   }
   else {
     ch_reads = ch_reads_input
+    ch_fastqc = fastqc(ch_reads_input)
   }
   
   if ( params.bowtie2 ) {
@@ -60,18 +59,17 @@ workflow {
   ch_cov = coverage(ch_filter)
   
   if ( params.trim ) {
-      ch_multiqc = multiqc_trim(ch_fastqc.collect(),
-                           ch_trimgalore_txt.collect(),
-                           ch_fastqc_trim.collect(),
-                           ch_align.collect(),
-                           ch_filter.collect(),
-                           ch_cov.collect())
+      ch_multiqc = multiqc_trim(ch_trimgalore_txt.collect(),
+                                ch_fastqc_trim.collect(),
+                                ch_align.collect(),
+                                ch_filter.collect(),
+                                ch_cov.collect())
   }
   else {
     ch_multiqc = multiqc(ch_fastqc.collect(),
-                           ch_align.collect(),
-                           ch_filter.collect(),
-                           ch_cov.collect())
+                         ch_align.collect(),
+                         ch_filter.collect(),
+                         ch_cov.collect())
   }
   
 }
