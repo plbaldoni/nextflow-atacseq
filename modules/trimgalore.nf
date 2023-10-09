@@ -2,7 +2,7 @@ process trimgalore {
   container 'quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0'
   memory '32GB'
   cpus 4
-  time '1 h'
+  time '4 h'
   tag "$sample_id"
 
   input:
