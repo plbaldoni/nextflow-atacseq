@@ -3,7 +3,7 @@ process subread_align {
   module 'samtools/1.18'
   memory '64GB'
   cpus 8
-  time '4 h'
+  time '8 h'
   tag "$sample_id"
 
   input:
