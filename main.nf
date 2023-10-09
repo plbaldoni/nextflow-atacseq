@@ -12,6 +12,8 @@ params.bowtie2 = false
 params.repair = false
 params.trim = false
 params.singleEnd = false
+params.bowtie2Time = "12h"
+params.subreadTime = "12h"
 
 include { fastqc } from './modules/fastqc'
 include { fastqc as fastqc_trim} from './modules/fastqc'

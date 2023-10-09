@@ -2,8 +2,8 @@ process bowtie2_align {
   module 'bowtie2/2.4.4'
   module 'samtools/1.18'
   memory '64GB'
-  cpus 8
-  time '8 h'
+  cpus 4
+  time params.bowtie2Time
   tag "$sample_id"
 
   input:
