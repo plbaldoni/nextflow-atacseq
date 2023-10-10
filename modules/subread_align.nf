@@ -1,8 +1,8 @@
 process subread_align {
   module 'subread/2.0.6'
   module 'samtools/1.18'
-  memory '64GB'
-  cpus 4
+  memory '72GB'
+  cpus 12
   time params.subreadTime
   tag "$sample_id"
 
