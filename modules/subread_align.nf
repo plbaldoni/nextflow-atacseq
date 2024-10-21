@@ -1,6 +1,6 @@
 process subread_align {
-  module 'subread/2.0.6'
-  container 'quay.io/biocontainers/samtools:1.21--h50ea8bc_0'
+  module 'subread'
+  module 'samtools'
   memory '72GB'
   cpus 12
   time params.subreadTime

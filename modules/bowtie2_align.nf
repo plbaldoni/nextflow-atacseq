@@ -1,6 +1,6 @@
 process bowtie2_align {
-  container 'quay.io/biocontainers/bowtie2:2.4.4--py36hd4290be_0'
-  container 'quay.io/biocontainers/samtools:1.21--h50ea8bc_0'
+  module 'bowtie2'
+  module 'samtools'
   memory '72GB'
   cpus 12
   time params.bowtie2Time
