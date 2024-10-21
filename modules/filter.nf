@@ -46,7 +46,7 @@ process filter {
     
     # Remove orphan reads and reads maping to different chromosomes
     samtools fixmate -r ${tmpbam} ${tmpfixbam}
-    samtools view ${opt} -u ${tmpfixbam} | samtools sort /dev/stdin -o ${filtbam}
+    samtools view ${opt} -u ${tmpfixbam} | samtools sort /dev/stdin | samtools addreplacerg -r "@RG\tID:RG1\tSM:SampleName\tPL:Illumina\tLB:Library.fa" -o ${filtbam} /dev/stdin
     rm -rf ${tmpbam} ${tmpfixbam}
     
     # Marking duplicates and index
