@@ -5,8 +5,8 @@ params.mapq = 30
 params.gsize = 2654605538 // GRCm39 genome size (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001635.27/)
 params.subreadIndex = "$launchDir/subread_index"
 params.bowtie2Index = "$launchDir/bowtie2_index"
-params.subread = false
-params.bowtie2 = false
+params.useSubread = false
+params.useBowtie2 = false
 params.repair = false
 params.trim = false
 params.singleEnd = false
@@ -49,10 +49,10 @@ workflow {
     ch_fastqc = fastqc(ch_reads_input)
   }
 
-  if ( params.bowtie2 ) {
+  if ( params.useBowtie2 ) {
     ch_align = bowtie2_align(ch_reads)
   }
-  if ( params.subread ) {
+  if ( params.useSubread ) {
     ch_align = subread_align(ch_reads)
   }
 
