@@ -19,7 +19,7 @@ process bowtie2_align {
     def read1 = !single ? /-1 "${reads[0]}"/ : /-U "${reads}"/
     def read2 = !single ? /-2 "${reads[1]}"/ : ''
     """
-    bowtie2 --mm ${params.optBowtie2} \
+    bowtie2 --mm ${params.bowtie2Opt} \
     -x ${params.bowtie2Index} \
     --threads ${task.cpus} \
     ${read1} ${read2} |

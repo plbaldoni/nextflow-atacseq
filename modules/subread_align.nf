@@ -18,9 +18,8 @@ process subread_align {
     def single = reads instanceof Path
     def read1 = !single ? /-r "${reads[0]}"/ : /-r "${reads}"/
     def read2 = !single ? /-R "${reads[1]}"/ : ''
-    def alignOpt = params.optSubread
     """
-    subread-align -t 1 ${alignOpt} \
+    subread-align -t 1 ${params.subreadOpt} \
     -T ${task.cpus} \
     -i ${params.subreadIndex} \
     ${read1} ${read2} \
