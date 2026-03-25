@@ -12,8 +12,8 @@ params.trim = false
 params.singleEnd = false
 params.bowtie2Time = "24h"
 params.subreadTime = "24h"
-params.bowtie2Opt = "-k 4 -X 2000"
-params.subreadOpt = "--sortReadsByCoordinates --multiMapping -B 4 -D 2000"
+params.optBowtie2 = "-k 4 -X 2000"
+params.optSubread = "--sortReadsByCoordinates --multiMapping -B 4 -D 2000"
 
 include { fastqc } from './modules/fastqc'
 include { fastqc as fastqc_trim} from './modules/fastqc'
