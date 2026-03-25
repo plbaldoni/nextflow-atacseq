@@ -8,7 +8,7 @@ process bowtie2_align {
 
   input:
     tuple val(sample_id), path(reads)
-    
+
   output:
     tuple val(sample_id), path(outbam), path(outstat)
 
@@ -19,14 +19,12 @@ process bowtie2_align {
     def read1 = !single ? /-1 "${reads[0]}"/ : /-U "${reads}"/
     def read2 = !single ? /-2 "${reads[1]}"/ : ''
     """
-    bowtie2 --mm \
-    -k $params.maxmultimap \
-    -X $params.maxfraglen \
-    --threads $task.cpus \
+    bowtie2 --mm $params.bowtie2Opt \
     -x $params.bowtie2Index \
+    --threads $task.cpus \
    	${read1} ${read2} |
    	samtools view -Su /dev/stdin | samtools sort - -o ${outbam}
-    
+
     samtools index ${outbam}
     samtools stat ${outbam} > ${outstat}
     """

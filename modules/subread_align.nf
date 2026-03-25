@@ -8,7 +8,7 @@ process subread_align {
 
   input:
     tuple val(sample_id), path(reads)
-    
+
   output:
     tuple val(sample_id), path(outbam), path(outstat)
 
@@ -19,15 +19,12 @@ process subread_align {
     def read1 = !single ? /-r "${reads[0]}"/ : /-r "${reads}"/
     def read2 = !single ? /-R "${reads[1]}"/ : ''
     """
-    subread-align --sortReadsByCoordinates --multiMapping \
+    subread-align -t 1 $params.subreadOpt \
     -T $task.cpus \
     -i $params.subreadIndex \
-    -t 1 \
-    -D $params.maxfraglen \
-    -B $params.maxmultimap \
     ${read1} ${read2} \
     -o ${outbam}
-    
+
     samtools index ${outbam}
     samtools stat ${outbam} > ${outstat}
     """

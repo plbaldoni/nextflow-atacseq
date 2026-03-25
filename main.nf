@@ -3,8 +3,6 @@ params.outdir = "$launchDir"
 params.erate = 0.2
 params.mapq = 30
 params.gsize = 2654605538 // GRCm39 genome size (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001635.27/)
-params.maxmultimap = 4
-params.maxfraglen = 2000
 params.subreadIndex = "$launchDir/subread_index"
 params.bowtie2Index = "$launchDir/bowtie2_index"
 params.subread = false
@@ -14,6 +12,8 @@ params.trim = false
 params.singleEnd = false
 params.bowtie2Time = "24h"
 params.subreadTime = "24h"
+params.bowtie2Opt = "-k 4 -X 2000"
+params.subreadOpt = "--sortReadsByCoordinates --multiMapping -B 4 -D 2000"
 
 include { fastqc } from './modules/fastqc'
 include { fastqc as fastqc_trim} from './modules/fastqc'
@@ -27,19 +27,19 @@ include { multiqc } from './modules/multiqc'
 include { repair } from './modules/repair'
 
 workflow {
-  
+
   if ( params.repair ) {
     if ( params.singleEnd ) {
       error "Repair is only possible for paired-end reads"
     }
     else {
-      ch_reads_input = repair(Channel.fromFilePairs(params.reads, checkIfExists: true)) 
+      ch_reads_input = repair(Channel.fromFilePairs(params.reads, checkIfExists: true))
     }
   }
   else {
     ch_reads_input = Channel.fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2, checkIfExists: true)
   }
-  
+
   if ( params.trim ) {
     (ch_reads,ch_trimgalore_txt) = trimgalore(ch_reads_input)
     ch_fastqc_trim = fastqc_trim(ch_reads)
@@ -48,18 +48,18 @@ workflow {
     ch_reads = ch_reads_input
     ch_fastqc = fastqc(ch_reads_input)
   }
-  
+
   if ( params.bowtie2 ) {
     ch_align = bowtie2_align(ch_reads)
   }
   if ( params.subread ) {
     ch_align = subread_align(ch_reads)
   }
-  
+
   ch_filter = filter(ch_align)
-  
+
   ch_cov = coverage(ch_filter)
-  
+
   if ( params.trim ) {
       ch_multiqc = multiqc_trim(ch_trimgalore_txt.collect(),
                                 ch_fastqc_trim.collect(),
@@ -73,5 +73,5 @@ workflow {
                          ch_filter.collect(),
                          ch_cov.collect())
   }
-  
+
 }
